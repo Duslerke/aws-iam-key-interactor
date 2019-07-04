@@ -28,8 +28,26 @@ deleteKey() {
 }
 
 recreateKey() {
+  if [ $recreatedKeys -eq 0 ]; then
+    createFile
+  fi
+  
   deleteKey "$1" "$2"
-  echo $(aws iam create-access-key --user-name "$2")
+  newKey=$(aws iam create-access-key --user-name $2 | jq '.AccessKey')  
+  appendToFile "$newKey"
+  ((recreatedKeys++))
+}
+
+createFile() {
+  touch $file
+  echo '{ "AccessKeys": [ ' >> $file 
+}
+
+appendToFile() {
+  if [ $recreatedKeys -ne 0 ]; then
+    echo -n "," >> $file
+  fi
+  echo $1 >> $file
 }
 
 checkIfUserHasKeys() {
@@ -59,11 +77,14 @@ showKeys() {
 }
 
 allowDeletion=$1
+recreatedKeys=0
+file="recreated_keys.json"
 
 users=$(aws iam list-users | jq '.Users')
-usersLen=$(echo "$users" | jq length)
+#usersLen=$(echo "$users" | jq length)
+usersLen=2
 
-for (( i=0; i<$usersLen; i++ ))
+for (( i=1; i<$usersLen; i++ ))
 do
   user=$(getJsonElement $i "$users" ".UserName") 
   echo "[$(($i + 1))/$usersLen] IAM user: $user"
@@ -78,4 +99,8 @@ do
   echo
   echo
 done
+
+if [ $recreatedKeys -ne 0 ]; then
+  echo "]}" >> $file
+fi
 
