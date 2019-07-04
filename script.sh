@@ -6,14 +6,30 @@ getJsonElement() {
 
 accountInteractor() {
   while true; do
-    read -p "Delete access key with Id \"$1\" for \"$2\"? y/n"$'\n' yn
-    case $yn in
-        [Yy]* ) echo deleting key... 
-          aws iam delete-access-key --access-key-id "$1" --user-name "$2"; break;;
-        [Nn]* ) echo deletion skipped; break;;
-        * ) echo "Please answer yes or no.";;
+    echo "-- Select an action to perform for key --"
+    printf "    (s) Skip" 
+    printf "    (d) Delete"
+    read -p "    (r) Recreate"$'\n' choice
+  
+    case $choice in
+        [Dd]* ) echo "deleting key..."
+          deleteKey "$1" "$2"; break;; 
+        [Rr]* ) echo "recreating key..." 
+          recreateKey "$1" "$2"
+          break;;
+        [Ss]* ) echo skipped; break;;
+        * ) echo "Invalid action"; break;;
     esac
   done
+}
+
+deleteKey() {
+  aws iam delete-access-key --access-key-id "$1" --user-name "$2"
+}
+
+recreateKey() {
+  deleteKey "$1" "$2"
+  echo $(aws iam create-access-key --user-name "$2")
 }
 
 checkIfUserHasKeys() {
