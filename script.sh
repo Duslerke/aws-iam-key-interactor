@@ -1,5 +1,14 @@
 #!/bin/bash
 
+trap closeFile INT
+
+closeFile() {
+  if [ $recreatedKeys -ne 0 ]; then
+    echo "]}" >> $file
+  fi
+  exit 0
+}
+
 getJsonElement() {
   echo $2 | jq '.'[$1] | jq -r $3
 }
@@ -15,8 +24,7 @@ accountInteractor() {
         [Dd]* ) echo "deleting key..."
           deleteKey "$1" "$2"; break;; 
         [Rr]* ) echo "recreating key..." 
-          recreateKey "$1" "$2"
-          break;;
+          recreateKey "$1" "$2"; break;;
         [Ss]* ) echo skipped; break;;
         * ) echo "Invalid action"; break;;
     esac
@@ -81,10 +89,9 @@ recreatedKeys=0
 file="recreated_keys.json"
 
 users=$(aws iam list-users | jq '.Users')
-#usersLen=$(echo "$users" | jq length)
-usersLen=2
+usersLen=$(echo "$users" | jq length)
 
-for (( i=1; i<$usersLen; i++ ))
+for (( i=0; i<$usersLen; i++ ))
 do
   user=$(getJsonElement $i "$users" ".UserName") 
   echo "[$(($i + 1))/$usersLen] IAM user: $user"
@@ -100,7 +107,4 @@ do
   echo
 done
 
-if [ $recreatedKeys -ne 0 ]; then
-  echo "]}" >> $file
-fi
-
+closeFile
