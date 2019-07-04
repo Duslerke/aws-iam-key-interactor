@@ -5,6 +5,7 @@ trap closeFile INT
 closeFile() {
   if [ $recreatedKeys -ne 0 ]; then
     echo "]}" >> $file
+    echo "Re-created keys exported to $file"
   fi
   exit 0
 }
@@ -86,7 +87,7 @@ showKeys() {
 
 allowDeletion=$1
 recreatedKeys=0
-file="recreated_keys.json"
+file="recreated_keys$(date +%H%m%S).json"
 
 users=$(aws iam list-users | jq '.Users')
 usersLen=$(echo "$users" | jq length)
