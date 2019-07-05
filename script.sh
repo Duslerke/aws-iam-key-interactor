@@ -63,7 +63,7 @@ append_to_file() {
   echo $1 >> $FILE
 }
 
-check_if_user_has_keys() {
+user_has_keys() {
   keys=$(aws iam list-access-keys --user-name "$user" | jq '.AccessKeyMetadata')
   if [ "$keys" = "[]" ]; then
     return 1
@@ -90,6 +90,7 @@ show_keys() {
   done
 }
 
+
 users=$(aws iam list-users | jq '.Users')
 users_len=$(echo "$users" | jq length)
 
@@ -98,8 +99,7 @@ do
   user=$(get_json_element $i "$users" ".UserName") 
   echo "[$(($i + 1))/$users_len] IAM user: $user"
   
-  check_if_user_has_keys
-  if [ $? -eq 0 ]; then
+  if user_has_keys; then
     show_keys "$keys"
   else
     echo "    User has no generated keys"
