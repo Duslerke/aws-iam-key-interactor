@@ -4,7 +4,7 @@ ALLOW_DELETION=$1
 RECREATED_KEYS=0
 FILE="recreated_keys_$(date +%H%M%S).json"
 
-trap close_file INT
+trap close_file 2
 
 close_file() {
   if [ $RECREATED_KEYS -ne 0 ]; then
@@ -77,10 +77,8 @@ show_keys() {
   for (( j=0; j<$keys_len; j++ ))
   do 
     key_id=$(get_json_element $j "$1" ".AccessKeyId")
-    #created=$(date -jf '%Y-%m-%dT%H:%M:%SZ' $(get_json_element $j "$1" ".CreateDate"))
-    created=$(date -d $(get_json_element $j "$1" ".CreateDate") '+%d %b %Y')
     echo "    Key Id: $key_id ($(get_json_element $j "$1" ".Status"))"
-    echo "    Created on $created"
+    echo "    Created on $(formatDate "$1" $j)"
     
     if [ "$ALLOW_DELETION" = "allow-deletion" ]; then 
       account_interactor "$key_id" "$user" 
@@ -90,6 +88,13 @@ show_keys() {
   done
 }
 
+formatDate() {
+  if [ $(uname | grep Linux | wc -l) -eq 1 ]; then
+    echo $(date -d $(get_json_element $2 "$1" ".CreateDate") '+%d %b %Y')
+  else
+    echo $(date -jf '%Y-%m-%dT%H:%M:%SZ' $(get_json_element $j "$1" ".CreateDate") +'%d %b %Y')
+  fi
+}
 
 users=$(aws iam list-users | jq '.Users')
 users_len=$(echo "$users" | jq length)
