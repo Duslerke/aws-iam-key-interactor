@@ -1,7 +1,6 @@
 # aws-iam-key-interactor
 
 Bash script that allows us to perform operations with the IAM access keys for AWS accounts.
-It currently only allows to delete access keys.
 
 ## Dependencies
 - aws CLI
