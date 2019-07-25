@@ -9,7 +9,7 @@ trap close_file 2
 close_file() {
   if [ $RECREATED_KEYS -ne 0 ]; then
     echo "]}" >> $FILE
-    echo "Re-created keys have been exported to $FILE"
+    echo " Re-created keys have been exported to $FILE"
   fi
   exit 0
 }
