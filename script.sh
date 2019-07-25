@@ -15,7 +15,7 @@ close_file() {
 }
 
 get_json_element() {
-  echo $2 | jq '.'[$1] | jq -r $3
+  echo $2 | jq -r '.'[$1].$3
 }
 
 account_interactor() {
@@ -76,8 +76,8 @@ show_keys() {
   keys_len=$(echo "$1" | jq length) 
   for (( j=0; j<$keys_len; j++ ))
   do 
-    key_id=$(get_json_element $j "$1" ".AccessKeyId")
-    echo "    Key Id: $key_id ($(get_json_element $j "$1" ".Status"))"
+    key_id=$(get_json_element $j "$1" "AccessKeyId")
+    echo "    Key Id: $key_id ($(get_json_element $j "$1" "Status"))"
     echo "    Created on $(formatDate "$1" $j)"
     
     if [ "$ALLOW_DELETION" = "allow-deletion" ]; then 
@@ -90,9 +90,9 @@ show_keys() {
 
 formatDate() {
   if [ $(uname | grep Linux | wc -l) -eq 1 ]; then
-    echo $(date -d $(get_json_element $2 "$1" ".CreateDate") '+%d %b %Y')
+    echo $(date -d $(get_json_element $2 "$1" "CreateDate") '+%d %b %Y')
   else
-    echo $(date -jf '%Y-%m-%dT%H:%M:%SZ' $(get_json_element $j "$1" ".CreateDate") +'%d %b %Y')
+    echo $(date -jf '%Y-%m-%dT%H:%M:%SZ' $(get_json_element $j "$1" "CreateDate") +'%d %b %Y')
   fi
 }
 
@@ -101,7 +101,7 @@ users_len=$(echo "$users" | jq length)
 
 for (( i=0; i<$users_len; i++ ))
 do
-  user=$(get_json_element $i "$users" ".UserName") 
+  user=$(get_json_element $i "$users" "UserName") 
   echo "[$(($i + 1))/$users_len] IAM user: $user"
   
   if user_has_keys; then
