@@ -42,7 +42,7 @@ delete_key() {
 
 recreate_key() {
   if [ $RECREATED_KEYS -eq 0 ]; then
-    create_file
+    create_and_start_file
   fi
   
   delete_key "$1" "$2"
@@ -51,7 +51,7 @@ recreate_key() {
   ((RECREATED_KEYS++))
 }
 
-create_file() {
+create_and_start_file() {
   touch $FILE
   echo '{ "AccessKeys": [ ' >> $FILE 
 }
@@ -97,10 +97,9 @@ formatDate() {
 }
 
 users=$(aws iam list-users | jq '.Users')
-users_len=$(echo "$users" | jq length)
+users_len=$(echo $users | jq length)
 
-for (( i=0; i<$users_len; i++ ))
-do
+for (( i=0; i<$users_len; i++ )); do
   user=$(get_json_element $i "$users" "UserName") 
   echo "[$(($i + 1))/$users_len] IAM user: $user"
   
@@ -115,3 +114,4 @@ do
 done
 
 close_file
+exit 0
