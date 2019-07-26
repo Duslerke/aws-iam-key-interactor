@@ -89,7 +89,7 @@ show_keys() {
 }
 
 formatDate() {
-  if [ $(uname | grep Linux | wc -l) -eq 1 ]; then
+  if [ $(uname | grep Linux | wc -l) -eq 1 ] || [ $(uname | grep MINGW | wc -l) -eq 1 ]; then
     echo $(date -d $(get_json_element $2 "$1" "CreateDate") '+%d %b %Y')
   else
     echo $(date -jf '%Y-%m-%dT%H:%M:%SZ' $(get_json_element $j "$1" "CreateDate") +'%d %b %Y')
