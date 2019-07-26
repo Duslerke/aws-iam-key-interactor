@@ -22,21 +22,18 @@ Bash script that allows us to perform operations with the IAM access keys for AW
   ```
   aws configure
   ```
-3. Download and install `git for Windows` - you'll need the `bash terminal` that comes with it.
+3. Download and install `git for Windows` - you'll need the `bash terminal` that comes with it. [Download 'git for Windows'](https://gitforwindows.org/)
   
-  [Download 'git for Windows'](https://gitforwindows.org/)
-  
-4. Install `Chocolatey` for your Command Prompt (need this to be able to use jq dependency)
+4. Install `Chocolatey` for your Command Prompt (need this to be able to use jq dependency) [Chocolatey Install](https://chocolatey.org/install)
+
   ```
   All you need to do is just to copy one command line into CMD.
   ```
-  [Chocolatey Install](https://chocolatey.org/install)
-
-5. Install `jq` dependency.
+  
+5. Install `jq` dependency. [Their website](https://stedolan.github.io/jq/download/)
   ```
   chocolatey install jq
   ```
-  [Their website](https://stedolan.github.io/jq/download/)
 
 6. Reopen your CMD and navigate to the 'aws-iam-key-interactor' repository, then run the script:
   ```
